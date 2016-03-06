@@ -1,0 +1,37 @@
+ <p class="slds-text-heading--label slds-m-bottom--small slds-media__body"> Data Archiving with Salesforce Lightning Design System </p>
+ <div id="apnd">
+ {{#each records}}
+ 
+	 <div class="demo-only" style="max-width:300px;" data-reactid=".1s"> 
+		<div class="slds-card">
+		 
+		  <div class="slds-grid slds-grid--align-spread slds-has-flexi-truncate">
+			<div class="slds-card__body">
+			 
+		     <p class="slds-tile__title slds-truncate slds-text-align--center"><a href="/sobject/{{get this 'name'}}">{{get this 'name'}} </a></p>
+			</div>
+		  </div>
+		</div>
+	 </div>
+ 
+ 
+	
+ {{/each}}
+ </div>
+ 
+
+ <style>
+ #apnd div {
+    height: 101px;
+    width: 212px;
+    margin-left: 5px;
+    float: left;
+    vertical-align: middle;
+    margin-bottom: 5px;
+}
+
+
+.slds-card__body p {
+    padding: 30px 0;
+    
+}

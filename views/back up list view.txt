@@ -1,0 +1,33 @@
+ <div class="myapp">
+  <div class="slds-scrollable--x">
+	 <table class="slds-table slds-table--bordered">
+		<thead>
+			<tr>
+			  <th scope="col"></th>
+			  <th scope="col">Name</th>
+			</tr>
+			<tbody>
+				{{#each records}}
+				<tr>
+				  <td>
+					<span class="slds-icon__container slds-icon-standard-account">
+					 
+					</span>
+				  </td>
+				  <td>  {{get this 'Name'}} </td>
+				   
+				</tr>
+				{{/each}}
+			</tbody>
+		</thead>
+	 </table>
+  </div>
+ </div>
+
+
+
+ /*
+  
+  //expand the field list so it looks right
+    document.getElementById('QB_field_sel').size += 2;
+  */

@@ -1,0 +1,165 @@
+ <style>
+.filter_field{
+	float:right;
+	width: 870px;
+	height: 75px;
+}
+
+.soql_query_div .soql_query_result{
+	clear: both;
+}
+
+
+.query_field {
+    width: 75px;
+    float: left;
+}
+</style>
+<div class="body">
+	<p> Selected Object:	{{{objectName}}} </p>
+	<input id = "ObjectName" type="hidden" name="ObjectName" value={{{objectName}}}/>
+	 <div class = "query_field">
+		 <select class ="orderby" id = "field_select"  multiple="mutliple" size="6" style="width: 16em;" onchange="buildQuery();" onkeyup="buildQuery();" > 
+			 
+			{{#each fields}}
+					<option value="{{{name}}}"> {{name}} </option>
+				   
+			  {{/each}}
+		 </select>
+	 </div>
+ 
+	 <div class = "filter_field" id="filter_div">
+	 	
+	
+			<span class="slds-icon__container" onclick = "addNewFilter();">
+			  <svg aria-hidden="true" class="slds-icon slds-icon-text-default">
+				<use xlink:href="/assets/icons/action-sprite/svg/symbols.svg#new"></use>
+			  </svg>
+			  <span class="slds-assistive-text">Lock Icon</span>
+			</span>
+		<ul class="tabs">
+			 <li id = "filter_list_0">
+				<select class ="orderby filter_selcted_field" size="1" style="width: 16em;"  onchange="buildQuery();" onkeyup="buildQuery();" > 
+						<option value=""></option>
+						 
+						{{#each fields}}
+								<option value="{{{name}}}"> {{name}} </option>
+							   
+						  {{/each}}
+				</select>
+				
+				<select  name="filter_compOper" class = "filter_compOper" style="width: 6em;" onchange="buildQuery();" onkeyup="buildQuery();"  >
+					<option value="=">=</option>
+					<option value="!=">≠</option>
+					<option value="<">&lt;</option>
+					<option value="<=">≤</option>
+					<option value=">">&gt;</option>
+					<option value=">=">≥</option>
+					<option value="starts">starts with</option>
+					<option value="ends">ends with</option>
+					<option value="contains">contains</option>
+					<option value="IN">in</option>
+					<option value="NOT IN">not in</option>
+					<option value="INCLUDES">includes</option>
+					<option value="EXCLUDES">excludes</option>
+			   </select>
+			   
+			   <input type="text" class="filter_value" size="31" name="filter_value" value="" onkeyup="buildQuery();"  >
+			</li>
+	   </ul>
+	</div>
+	<form action="/executequery" method="GET" class="slds-form--stacked">
+		<div class = "soql_query_div">
+			<br>
+			<p style="clear: both;"> Enter or modify a SOQL query below:</p>
+			<br>
+				<textarea id="soql_query_textarea" type="text" name="soql_query" rows="5" style="width: 99%; overflow: auto; font-family: monospace, courier;"></textarea>
+			<br>
+				<button class="slds-button slds-button--brand slds-m-top--medium" type="submit">Execute Query</button>
+		</div>
+	</form>
+	 
+	 <div class = "soql_query_result">
+	 
+		{{queryresults}}
+	 </div>
+ </div>
+  
+<script>
+ 
+	function addNewFilter(){
+		$("#filter_div ul").append($('#filter_div ul li:first').clone().attr('id', 'filter_list_'+$("#filter_div ul li").length)) 
+		$('#filter_div').css('height','+=20px');
+		 
+	}
+	
+	function buildQuery(){
+	 
+		 QB_fields_selected = new Array();
+		 
+		 $("#field_select > :selected").each(function() { 
+				QB_fields_selected.push($(this).text());
+		 })
+		 
+		  var soql_select = '';
+		  if (QB_fields_selected.length > 0) {
+			var soql_select = 'SELECT ' + QB_fields_selected + ' FROM ' + $("#ObjectName").val();
+		  }
+		  
+		    soql_where = '';
+		  $("#filter_div ul li").each(function(idx,li) {
+			 
+			var QB_filter_field = $("#filter_list_"+idx+" "+".filter_selcted_field").val();
+			var QB_filter_compOper = $("#filter_list_"+idx+" "+".filter_compOper").val();
+			var QB_filter_value = $("#filter_list_"+idx+" "+".filter_value").val();
+			//console.log('inside filter'+QB_filter_field);
+			
+			  var soql_where_logicOper = '';
+			if ($("#filter_div ul li").length > 1 && idx != 0) {
+				soql_where_logicOper = ' AND ';
+				  
+			}
+
+			if (QB_filter_field && QB_filter_compOper && QB_filter_value) {
+				if (QB_filter_compOper == 'starts') {
+					QB_filter_compOper = 'LIKE'
+					QB_filter_value = QB_filter_value + '%';
+				} else if (QB_filter_compOper == 'ends') {
+					QB_filter_compOper = 'LIKE'
+					QB_filter_value = '%' + QB_filter_value;
+				} else if (QB_filter_compOper == 'contains') {
+					QB_filter_compOper = 'LIKE'
+					QB_filter_value = '%' + QB_filter_value + '%';
+				}
+
+
+				if (QB_filter_compOper == 'IN' ||
+					QB_filter_compOper == 'NOT IN' ||
+					QB_filter_compOper == 'INCLUDES' ||
+					QB_filter_compOper == 'EXCLUDES') {
+					QB_filter_value_q = '(' + QB_filter_value + ')';
+				} else {
+					QB_filter_value_q = '\'' + QB_filter_value + '\'';
+				}
+
+				soql_where += soql_where_logicOper + QB_filter_field + ' ' + QB_filter_compOper + ' ' + QB_filter_value_q;
+				
+			 }   
+  
+		  })
+		   
+		  soql_where = soql_where != '' ? ' WHERE ' + soql_where : '';
+		   console.log('soql_where outside 2: '+soql_where);
+		   
+		   
+		  $("#soql_query_textarea").val(soql_select + soql_where);
+	
+	}
+	
+	 
+</script>
+	 
+	 
+	 
+ 
+  
